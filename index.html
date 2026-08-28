@@ -120,6 +120,13 @@
       data.words.unshift(...additions);
       data.migrations=[...(data.migrations||[]),PHOTO_MIGRATION];
     }
+    const REDBOOK_0828_MIGRATION='redbook-errors-2026-08-28-pages-11-12-v1';
+    if(!(data.migrations||[]).includes(REDBOOK_0828_MIGRATION)){
+      const existing=new Set(data.words.map(w=>normalizeTerm(w.term))),additions=[];
+      fresh().filter(w=>w.source.startsWith('8月28日错词')).forEach(w=>{const key=normalizeTerm(w.term);if(!existing.has(key)){existing.add(key);additions.push(w)}});
+      data.words.unshift(...additions);
+      data.migrations=[...(data.migrations||[]),REDBOOK_0828_MIGRATION];
+    }
     const phonetics=new Map(seed.map(x=>[x[0],x[1]]));data.words=data.words.map(w=>({...w,phonetic:w.phonetic||phonetics.get(w.term)||''}));
     let view='today',query='';const save=(sync=true)=>{data.updatedAt=isoNow();localStorage.setItem(KEY,JSON.stringify(data));if(sync)queueCloudSync()};save(false);
     const due=()=>data.words.filter(w=>w.dueDate<=today()).sort((a,b)=>a.dueDate.localeCompare(b.dueDate));

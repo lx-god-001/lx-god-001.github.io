@@ -2,6 +2,7 @@
   const source=n=>`8月25日手写词表｜图${n}`;
   const V=(term,phonetic,meaning,group,image)=>[term,phonetic,meaning,'个人生词',group,source(image)];
   const L=(term,phonetic,meaning,group,image)=>[term,phonetic,meaning,'逻辑连接',group,source(image)];
+  const E=(term,phonetic,meaning,page)=>[term,phonetic,meaning,'个人生词','红宝书错词',`8月28日错词｜第${page}页`];
 
   window.CIKE_PHOTO_SEED=[
     // 图1：构词与近义辨析
@@ -157,6 +158,42 @@
     V('tax-cutting','','减税的；削减税收','形容词',7),
     V('man-and-wife','','夫妻的；婚姻关系的','固定搭配',7),
     V('retail chain','','连锁零售店；零售连锁企业','名词',7),
-    V('grocery','/ˈɡroʊsəri/','食品杂货；杂货店','名词',7)
+    V('grocery','/ˈɡroʊsəri/','食品杂货；杂货店','名词',7),
+
+    // 8月28日红宝书错词：第11页（空白、明显误译或词性混淆）
+    E('meantime','/ˈmiːntaɪm/','其间；同时',11),
+    E('peer','/pɪr/','同龄人；同辈；同行',11),
+    E('security','/sɪˈkjʊrəti/','安全；保障；证券',11),
+    E('urge','/ɜːrdʒ/','催促；强烈要求；冲动',11),
+    E('rally','/ˈræli/','集会；重新振作；团结',11),
+    E('material','/məˈtɪriəl/','材料；物质；重要的',11),
+    E('oppress','/əˈpres/','压迫；使烦恼',11),
+    E('secure','/sɪˈkjʊr/','安全的；获得；使安全',11),
+    E('operational','/ˌɑːpəˈreɪʃənəl/','操作的；运营的；可使用的',11),
+    E('operate','/ˈɑːpəreɪt/','操作；运转；经营',11),
+    E('seem','/siːm/','似乎；好像',11),
+    E('opera','/ˈɑːprə/','歌剧',11),
+    E('range','/reɪndʒ/','范围；一系列；变化幅度',11),
+    E('write','/raɪt/','写；书写；写作',11),
+    E('valuable','/ˈvæljuəbəl/','有价值的；贵重的',11),
+
+    // 8月28日红宝书错词：第12页
+    E('variance','/ˈveriəns/','差异；变化；方差',12),
+    E('weird','/wɪrd/','奇怪的；怪异的',12),
+    E('tow','/toʊ/','拖；牵引',12),
+    E('underestimate','/ˌʌndərˈestɪmeɪt/','低估；轻视',12),
+    E('underlying','/ˌʌndərˈlaɪɪŋ/','潜在的；根本的；下层的',12),
+    E('temporary','/ˈtempəreri/','暂时的；临时的',12),
+    E('knit','/nɪt/','编织；使紧密结合',12),
+    E('wage','/weɪdʒ/','工资；发动（战争）',12),
+    E('track','/træk/','轨道；踪迹；追踪',12),
+    E('vague','/veɪɡ/','模糊的；不明确的',12),
+    E('wear','/wer/','穿；戴；磨损',12),
+    E('unemployment','/ˌʌnɪmˈplɔɪmənt/','失业；失业人数',12),
+    E('tendency','/ˈtendənsi/','倾向；趋势',12),
+    E('vanish','/ˈvænɪʃ/','消失；突然不见',12),
+    E('terminate','/ˈtɜːrmɪneɪt/','终止；结束',12),
+    E('whisper','/ˈwɪspər/','低语；耳语',12),
+    E('understanding','/ˌʌndərˈstændɪŋ/','理解；理解力；体谅',12)
   ];
 })();
