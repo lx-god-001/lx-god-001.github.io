@@ -245,5 +245,18 @@ window.CIKE_PRONUNCIATION_AUDIO={
   "vanish": "/audio/6c7075955239fb1d.mp3",
   "terminate": "/audio/e261fbd24a6484c5.mp3",
   "whisper": "/audio/4a02811030962b84.mp3",
-  "understanding": "/audio/14a9d766458d6c1f.mp3"
+  "understanding": "/audio/14a9d766458d6c1f.mp3",
+  "unfashionable": "/audio/a1a88a273bef9677.mp3",
+  "sort": "/audio/98c4b8f6e2d770a0.mp3",
+  "involved": "/audio/58b2f303ba75469e.mp3",
+  "auction": "/audio/0677209ba55868a9.mp3",
+  "appeal": "/audio/c9120087813139e0.mp3",
+  "great extent": "/audio/e8130967976d6389.mp3",
+  "statement": "/audio/bbb930cc426507ed.mp3",
+  "awaiting": "/audio/ef627e60eef472fb.mp3",
+  "still": "/audio/677c1bfa3a036c74.mp3",
+  "divorce": "/audio/7c5c57a4dcae26f7.mp3",
+  "auction houses": "/audio/c4181b8c78cecf73.mp3",
+  "representing": "/audio/2833ac98927f88ab.mp3",
+  "fluctuation": "/audio/b2c934f98c8162a1.mp3"
 };

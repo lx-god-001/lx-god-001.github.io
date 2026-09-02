@@ -50,7 +50,7 @@
     const CLOUD={url:'https://dllfiwhqhrquisohwxtp.supabase.co',publishableKey:'sb_publishable_S7dVDMwIb_Jvh24ETm3Ejg_rVZdAiP0',table:'cike_user_data'};
     const cloudDemo=!CLOUD.url&&location.hostname==='127.0.0.1',cloudReady=Boolean(CLOUD.url&&CLOUD.publishableKey)||cloudDemo,isoNow=()=>new Date().toISOString();
     let cloudSession;try{cloudSession=JSON.parse(localStorage.getItem(SESSION_KEY))}catch(e){}
-    let cloudState=cloudReady?(cloudSession?'online':'signedOut'):'setup',cloudTimer=null,cloudSyncing=false,lastSyncedAt='',installPrompt=null;
+    let cloudState=cloudReady?(cloudSession?'online':'signedOut'):'setup',cloudTimer=null,cloudRetryTimer=null,sessionRefreshTimer=null,sessionRefreshPromise=null,cloudSyncing=false,lastSyncedAt='',installPrompt=null;
     const seed=[
       ['marginal','/ˈmɑːrdʒɪnəl/','边缘的；微小的；不重要的','个人生词','形容词','红宝书手写标记'],['participate','/pɑːrˈtɪsɪpeɪt/','参加；参与','个人生词','动词','红宝书手写标记'],['imagination','/ɪˌmædʒɪˈneɪʃən/','想象力；想象','个人生词','名词','红宝书手写标记'],['partner','/ˈpɑːrtnər/','伙伴；合伙人；合作方','个人生词','名词','红宝书手写标记'],['quit','/kwɪt/','停止；离开；辞职','个人生词','动词','红宝书手写标记'],['paragraph','/ˈpærəɡræf/','段落','个人生词','名词','红宝书手写标记'],['participant','/pɑːrˈtɪsɪpənt/','参与者；参加者','个人生词','名词','红宝书手写标记'],['generous','/ˈdʒenərəs/','慷慨的；丰富的；大量的','个人生词','形容词','红宝书手写标记'],['questionnaire','/ˌkwestʃəˈner/','调查问卷','个人生词','名词','红宝书手写标记'],['massive','/ˈmæsɪv/','巨大的；大规模的','个人生词','形容词','红宝书手写标记'],['means','/miːnz/','方法；手段','个人生词','名词','红宝书手写标记'],['throughout','/θruːˈaʊt/','遍及；贯穿；自始至终','个人生词','介词/副词','红宝书手写标记'],['masterpiece','/ˈmæstərpiːs/','杰作；代表作','个人生词','名词','红宝书手写标记'],['writer','/ˈraɪtər/','作家；作者','个人生词','名词','红宝书手写标记'],['oppose','/əˈpoʊz/','反对；抵制','个人生词','动词','红宝书手写标记'],['patch','/pætʃ/','小块；补丁；修补','个人生词','名词/动词','红宝书手写标记'],['pattern','/ˈpætərn/','模式；规律；图案','个人生词','名词','红宝书手写标记'],['perceive','/pərˈsiːv/','察觉；感知；理解','个人生词','动词','红宝书手写标记'],['measure','/ˈmeʒər/','措施；衡量；测量','个人生词','名词/动词','红宝书手写标记'],['percentage','/pərˈsentɪdʒ/','百分比；比例','个人生词','名词','红宝书手写标记'],['rank','/ræŋk/','等级；排名；排列','个人生词','名词/动词','红宝书手写标记'],
       ['in theory / in practice','/ɪn ˈθɪəri / ɪn ˈpræktɪs/','理论上／实际上；构成强对比','逻辑连接','转折与对比','8.22英语周测'],['compared with','/kəmˈperd wɪð/','与……相比；建立对照','逻辑连接','比较','8.22英语周测'],['in the long term','/ɪn ðə lɔːŋ tɜːrm/','从长期来看；观察最终趋势','逻辑连接','时间与趋势','8.22英语周测'],['be attributed to','/bi əˈtrɪbjətɪd tuː/','被归因于；引出原因','逻辑连接','因果','8.22英语周测'],['in fact','/ɪn fækt/','实际上；纠正常见判断','逻辑连接','转折与纠正','8.22英语周测'],['rather than','/ˈræðər ðæn/','而不是；排除错误对象','逻辑连接','选择与对比','8.22英语周测'],['in exchange for','/ɪn ɪksˈtʃeɪndʒ fɔːr/','以……换取……','逻辑连接','交换关系','8.22英语周测'],['double down on','/ˈdʌbəl daʊn ɑːn/','继续加码；进一步坚持','逻辑连接','态度与趋势','8.22英语周测'],['be poised to','/bi pɔɪzd tuː/','很可能；准备要','逻辑连接','状态与趋势','8.22英语周测'],['in line with','/ɪn laɪn wɪð/','与……一致','逻辑连接','一致关系','8.22英语周测'],
@@ -120,12 +120,25 @@
       data.words.unshift(...additions);
       data.migrations=[...(data.migrations||[]),PHOTO_MIGRATION];
     }
-    const REDBOOK_0828_MIGRATION='redbook-errors-2026-08-28-pages-11-12-v1';
+    const REDBOOK_0828_MIGRATION='redbook-errors-2026-08-28-pages-11-12-v2';
     if(!(data.migrations||[]).includes(REDBOOK_0828_MIGRATION)){
-      const existing=new Set(data.words.map(w=>normalizeTerm(w.term))),additions=[];
-      fresh().filter(w=>w.source.startsWith('8月28日错词')).forEach(w=>{const key=normalizeTerm(w.term);if(!existing.has(key)){existing.add(key);additions.push(w)}});
-      data.words.unshift(...additions);
-      data.migrations=[...(data.migrations||[]),REDBOOK_0828_MIGRATION];
+      const incoming=fresh().filter(w=>w.source.startsWith('8月28日错词'));
+      if(incoming.length){
+        const existing=new Set(data.words.map(w=>normalizeTerm(w.term))),additions=[];
+        incoming.forEach(w=>{const key=normalizeTerm(w.term);if(!existing.has(key)){existing.add(key);additions.push(w)}});
+        data.words.unshift(...additions);
+        data.migrations=[...(data.migrations||[]),REDBOOK_0828_MIGRATION];
+      }
+    }
+    const KDOCS_READING_MIGRATION='reading-vocabulary-2026-09-02-kdocs-v1';
+    if(!(data.migrations||[]).includes(KDOCS_READING_MIGRATION)){
+      const incoming=fresh().filter(w=>w.source.startsWith('9月2日阅读生词'));
+      if(incoming.length){
+        const existing=new Set(data.words.map(w=>normalizeTerm(w.term))),additions=[];
+        incoming.forEach(w=>{const key=normalizeTerm(w.term);if(!existing.has(key)){existing.add(key);additions.push(w)}});
+        data.words.unshift(...additions);
+        data.migrations=[...(data.migrations||[]),KDOCS_READING_MIGRATION];
+      }
     }
     const phonetics=new Map(seed.map(x=>[x[0],x[1]]));data.words=data.words.map(w=>({...w,phonetic:w.phonetic||phonetics.get(w.term)||''}));
     let view='today',query='';const save=(sync=true)=>{data.updatedAt=isoNow();localStorage.setItem(KEY,JSON.stringify(data));if(sync)queueCloudSync()};save(false);
@@ -193,7 +206,7 @@
       if(!navigator.onLine){btn.classList.add('error');label.textContent='离线使用';return}
       if(cloudState==='syncing'){btn.classList.add('syncing');label.textContent='同步中';return}
       if(cloudState==='online'&&cloudSession){btn.classList.add('online');label.textContent='已同步';return}
-      if(cloudState==='error'){btn.classList.add('error');label.textContent='同步异常';return}
+      if(cloudState==='error'){btn.classList.add('error');label.textContent=cloudSession?'等待重连':'同步异常';return}
       label.textContent=cloudReady?'登录同步':'同步待连接';
     }
     function queueCloudSync(){
@@ -204,18 +217,36 @@
       cloudSession=session||null;
       if(cloudSession){if(!cloudSession.expires_at&&cloudSession.expires_in)cloudSession.expires_at=Math.floor(Date.now()/1000)+cloudSession.expires_in;localStorage.setItem(SESSION_KEY,JSON.stringify(cloudSession));cloudState='online'}
       else{localStorage.removeItem(SESSION_KEY);cloudState=cloudReady?'signedOut':'setup'}
-      updateCloudButton();
+      scheduleSessionRefresh();updateCloudButton();
     }
     async function rawCloud(path,options={}){
       const res=await fetch(`${CLOUD.url}${path}`,{...options,headers:{apikey:CLOUD.publishableKey,'Content-Type':'application/json',...(options.headers||{})}});
-      if(!res.ok){let detail='';try{const body=await res.json();detail=body.msg||body.message||body.error_description||body.error||''}catch(e){}throw new Error(detail||`请求失败（${res.status}）`)}
+      if(!res.ok){let detail='',code='';try{const body=await res.json();detail=body.msg||body.message||body.error_description||body.error||'';code=body.error_code||body.code||''}catch(e){}const err=new Error(detail||`请求失败（${res.status}）`);err.status=res.status;err.code=code;throw err}
       if(res.status===204)return null;const text=await res.text();return text?JSON.parse(text):null;
     }
+    function terminalAuthError(err){
+      const detail=`${err?.code||''} ${err?.message||''}`.toLowerCase();
+      return err?.code==='missing_refresh_token'||err?.status===401||(err?.status===400&&/(refresh.?token|invalid.?grant|session.*expired)/.test(detail));
+    }
+    function scheduleSessionRefresh(){
+      clearTimeout(sessionRefreshTimer);sessionRefreshTimer=null;if(!cloudSession?.refresh_token)return;
+      const refreshAt=Number(cloudSession.expires_at||0)*1000-Date.now()-5*60*1000;
+      sessionRefreshTimer=setTimeout(()=>bootstrapCloud(),Math.min(2147483647,Math.max(30000,refreshAt)));
+    }
+    function latestStoredSession(){try{return JSON.parse(localStorage.getItem(SESSION_KEY))}catch(e){return null}}
     async function ensureSession(){
-      if(!cloudSession?.refresh_token)throw new Error('登录状态已失效，请重新登录');
+      if(!cloudSession?.refresh_token){const err=new Error('登录状态已失效，请重新登录');err.code='missing_refresh_token';throw err}
       if((cloudSession.expires_at||0)>Math.floor(Date.now()/1000)+90)return cloudSession;
-      const freshSession=await rawCloud('/auth/v1/token?grant_type=refresh_token',{method:'POST',body:JSON.stringify({refresh_token:cloudSession.refresh_token})});
-      storeSession(freshSession);return cloudSession;
+      if(sessionRefreshPromise)return sessionRefreshPromise;
+      const refresh=async()=>{
+        const stored=latestStoredSession();
+        if(stored?.refresh_token&&(stored.expires_at||0)>(cloudSession.expires_at||0))cloudSession=stored;
+        if((cloudSession.expires_at||0)>Math.floor(Date.now()/1000)+90)return cloudSession;
+        const freshSession=await rawCloud('/auth/v1/token?grant_type=refresh_token',{method:'POST',body:JSON.stringify({refresh_token:cloudSession.refresh_token})});
+        storeSession(freshSession);return cloudSession;
+      };
+      const run=()=>navigator.locks?.request?navigator.locks.request('cike-auth-refresh',refresh):refresh();
+      sessionRefreshPromise=run();try{return await sessionRefreshPromise}finally{sessionRefreshPromise=null}
     }
     async function authedCloud(path,options={}){
       const session=await ensureSession();return rawCloud(path,{...options,headers:{Authorization:`Bearer ${session.access_token}`,...(options.headers||{})}});
@@ -238,7 +269,7 @@
         data.updatedAt=isoNow();
         await authedCloud(`/rest/v1/${CLOUD.table}?on_conflict=user_id`,{method:'POST',headers:{Prefer:'resolution=merge-duplicates,return=minimal'},body:JSON.stringify({user_id:user.id,payload:data,updated_at:data.updatedAt})});
         localStorage.setItem(KEY,JSON.stringify(data));lastSyncedAt=isoNow();cloudState='online';render();
-      }catch(err){cloudState='error';console.warn('词刻同步失败',err);updateCloudButton()}
+      }catch(err){cloudState='error';console.warn('词刻同步失败',err);updateCloudButton();clearTimeout(cloudRetryTimer);cloudRetryTimer=setTimeout(()=>bootstrapCloud(),30000)}
       finally{cloudSyncing=false;updateCloudButton()}
     }
     async function authSubmit(mode,email,password){
@@ -258,14 +289,18 @@
     }
     async function bootstrapCloud(){
       updateCloudButton();if(!cloudReady||!cloudSession||!navigator.onLine)return;
-      try{await ensureSession();await syncNow()}catch(err){storeSession(null);cloudState='error';updateCloudButton()}
+      clearTimeout(cloudRetryTimer);cloudRetryTimer=null;
+      try{await ensureSession();await syncNow();scheduleSessionRefresh()}
+      catch(err){if(terminalAuthError(err))storeSession(null);else{cloudState='error';updateCloudButton();cloudRetryTimer=setTimeout(()=>bootstrapCloud(),30000)}}
     }
     function showAdd(){document.querySelector('#modalRoot').innerHTML=`<div class="backdrop"><form class="modal add-form" id="addForm"><button type="button" class="close" id="closeModal">×</button><span class="eyebrow">NEW ENTRY</span><h2>添加到词库</h2><label>单词或固定搭配<input name="term" required placeholder="例如 notwithstanding"></label><label>音标（选填）<input name="phonetic" placeholder="例如 /ˌnɑːtwɪθˈstændɪŋ/"></label><label>中文释义<textarea name="meaning" required></textarea></label><div class="form-row"><label>大类<select name="category"><option>个人生词</option><option>逻辑连接</option></select></label><label>细分类<input name="group" value="自定义"></label></div><button class="primary" type="submit">保存并加入今日复习</button></form></div>`;document.querySelector('#closeModal').onclick=closeModal;document.querySelector('#addForm').onsubmit=e=>{e.preventDefault();const f=new FormData(e.target),term=f.get('term').trim();if(data.words.some(w=>normalizeTerm(w.term)===normalizeTerm(term))){alert('这个词已经在词库中，不会重复添加。');return}data.words.unshift({id:'custom-'+Date.now(),term,phonetic:f.get('phonetic').trim(),meaning:f.get('meaning').trim(),category:f.get('category'),group:f.get('group').trim()||'自定义',source:'手动添加',addedAt:today(),dueDate:today(),stage:0,reviews:0});save();closeModal()}}
     document.querySelector('#addBtn').onclick=showAdd;document.querySelector('#cloudBtn').onclick=()=>showCloud();document.querySelector('#installBtn').onclick=installApp;document.querySelector('#exportBtn').onclick=()=>{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:'application/json'}));a.download=`词刻备份-${today()}.json`;a.click();URL.revokeObjectURL(a.href)};document.querySelector('#importFile').onchange=async e=>{try{const x=JSON.parse(await e.target.files[0].text());if(!Array.isArray(x.words))throw 0;data=x;save();render()}catch(err){alert('导入失败，请选择词刻导出的备份文件。')}e.target.value=''};
     window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();installPrompt=e;updateInstallButton()});window.addEventListener('appinstalled',()=>{installPrompt=null;updateInstallButton()});window.matchMedia('(display-mode: standalone)').addEventListener?.('change',updateInstallButton);
-    window.addEventListener('online',()=>{cloudState=cloudSession?'online':cloudReady?'signedOut':'setup';updateCloudButton();queueCloudSync()});window.addEventListener('offline',updateCloudButton);
+    window.addEventListener('online',()=>{cloudState=cloudSession?'online':cloudReady?'signedOut':'setup';updateCloudButton();bootstrapCloud()});window.addEventListener('offline',updateCloudButton);
+    window.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')bootstrapCloud()});
+    window.addEventListener('storage',e=>{if(e.key!==SESSION_KEY)return;cloudSession=latestStoredSession();cloudState=cloudSession?'online':cloudReady?'signedOut':'setup';scheduleSessionRefresh();updateCloudButton()});
     if('speechSynthesis'in window){refreshVoices();window.speechSynthesis.onvoiceschanged=refreshVoices;window.addEventListener('pagehide',stopSpeaking)}
-    render();updateInstallButton();bootstrapCloud();
+    render();updateInstallButton();scheduleSessionRefresh();bootstrapCloud();
     if('serviceWorker'in navigator&&(location.protocol==='https:'||/^(localhost|127\.0\.0\.1)$/.test(location.hostname))){window.addEventListener('load',()=>navigator.serviceWorker.register('/service-worker.js',{scope:'/'}).then(reg=>reg.update()).catch(err=>console.warn('词刻离线功能初始化失败',err)))}
   })();
   </script>

@@ -3,6 +3,7 @@
   const V=(term,phonetic,meaning,group,image)=>[term,phonetic,meaning,'个人生词',group,source(image)];
   const L=(term,phonetic,meaning,group,image)=>[term,phonetic,meaning,'逻辑连接',group,source(image)];
   const E=(term,phonetic,meaning,page)=>[term,phonetic,meaning,'个人生词','红宝书错词',`8月28日错词｜第${page}页`];
+  const D=(term,phonetic,meaning,category='个人生词',group='阅读生词')=>[term,phonetic,meaning,category,group,'9月2日阅读生词｜金山文档'];
 
   window.CIKE_PHOTO_SEED=[
     // 图1：构词与近义辨析
@@ -194,6 +195,21 @@
     E('vanish','/ˈvænɪʃ/','消失；突然不见',12),
     E('terminate','/ˈtɜːrmɪneɪt/','终止；结束',12),
     E('whisper','/ˈwɪspər/','低语；耳语',12),
-    E('understanding','/ˌʌndərˈstændɪŋ/','理解；理解力；体谅',12)
+    E('understanding','/ˌʌndərˈstændɪŋ/','理解；理解力；体谅',12),
+
+    // 9月2日金山文档“阅读生词”；dealer 与 up-to-date 已在词库中，未重复加入
+    D('unfashionable','/ʌnˈfæʃənəbl/','过时的；不流行的'),
+    D('sort','/sɔːrt/','种类；类别；整理；分类'),
+    D('involved','/ɪnˈvɑːlvd/','牵涉的；参与的；复杂的'),
+    D('auction','/ˈɔːkʃən/','拍卖；拍卖会'),
+    D('appeal','/əˈpiːl/','吸引力；呼吁；上诉'),
+    D('great extent','/ɡreɪt ɪkˈstent/','很大程度（常用于 to a great extent：在很大程度上）','逻辑连接','程度限定'),
+    D('statement','/ˈsteɪtmənt/','陈述；声明；报表'),
+    D('awaiting','/əˈweɪtɪŋ/','等待；正等待（await 的现在分词）'),
+    D('still','/stɪl/','仍然；不过；尽管如此','逻辑连接','转折与延续'),
+    D('divorce','/dɪˈvɔːrs/','离婚；使分离'),
+    D('auction houses','/ˈɔːkʃən ˌhaʊzɪz/','拍卖行（复数）'),
+    D('representing','/ˌreprɪˈzentɪŋ/','代表；表现；说明（represent 的现在分词）'),
+    D('fluctuation','/ˌflʌktʃuˈeɪʃən/','波动；起伏')
   ];
 })();
