@@ -1,4 +1,4 @@
-const CACHE_NAME='cike-pwa-v6';
+const CACHE_NAME='cike-pwa-v7';
 const APP_SHELL=['/','/index.html','/photo-vocabulary.js','/pronunciation-audio.js','/manifest.webmanifest','/icon-192.png','/icon-512.png','/icon-maskable-512.png','/apple-touch-icon.png'];
 
 self.addEventListener('install',event=>{
